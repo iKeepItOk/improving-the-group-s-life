@@ -1,0 +1,86 @@
+package org.example.firsttry.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.example.firsttry.DTO.*;
+import org.example.firsttry.entity.Student;
+import org.example.firsttry.entity.UniversityGroup;
+import org.example.firsttry.error.Exception.NotFoundGroupException;
+import org.example.firsttry.mapper.GroupMapper;
+import org.example.firsttry.mapper.StudentMapper;
+import org.example.firsttry.repository.GroupRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@ConditionalOnProperty(value = "test.mode", havingValue = "fouls")
+public class GroupServiceImpl implements GroupService {
+
+    private final GroupRepository groupRepository;
+    private final GroupMapper groupMapper;
+    private final StudentMapper studentMapper;
+
+    public GroupServiceImpl(GroupRepository groupRepository, GroupMapper groupMapper, StudentMapper studentMapper) {
+        this.groupRepository = groupRepository;
+        this.groupMapper = groupMapper;
+        this.studentMapper = studentMapper;
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public void addGroup(AddGroupRequestDto addGroupRequestDto) {
+        groupRepository.save(groupMapper.toEntity(addGroupRequestDto));
+        log.info("Group created with number: {}", addGroupRequestDto.getNumber());
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public void deleteGroup(DeleteGroupRequestDto deleteGroupRequestDto) {
+        if (deleteGroupRequestDto.getNumber() == null) {
+            throw new NotFoundGroupException();
+        }
+        groupRepository.deleteUniversityGroupByNumber(deleteGroupRequestDto.getNumber());
+        log.info("Group deleted with number: {}", deleteGroupRequestDto.getNumber());
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, readOnly = true)
+    public GetAllGroupResponseDto getAllGroups() {
+        GetAllGroupResponseDto getAllGroup = new GetAllGroupResponseDto();
+        List<UniversityGroup> groups = groupRepository.findAll();
+        log.info("Number of groups: {}", groups.size());
+        getAllGroup.setGroups(groupMapper.toDtoList(groups));
+        return getAllGroup;
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, readOnly = true)
+    public GetGroupResponseDto getGroup(String number) {
+        GetGroupResponseDto getGroup = new GetGroupResponseDto();
+        UniversityGroup group = groupRepository.findUniversityGroupByNumber(number);
+        if (group == null) {
+            throw new NotFoundGroupException();
+        }
+        List<Student> students = group.getStudents();
+        log.info("Number of students: {}", students.size());
+        getGroup.setStudents(studentMapper.toDtoList(students));
+        return getGroup;
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, readOnly = true)
+    public void updateGroup(UpdateGroupRequestDto updateGroupRequestDto) {
+        UniversityGroup group = groupRepository.findUniversityGroupByNumber(updateGroupRequestDto.getOldNumber());
+        if (group == null) {
+            throw new NotFoundGroupException();
+        }
+        group.setNumber(updateGroupRequestDto.getNewNumber());
+        groupRepository.save(group);
+        log.info("Group updated with number: {}", group.getNumber());
+    }
+}
