@@ -1,5 +1,6 @@
 package org.example.firsttry.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.firsttry.DTO.*;
 import org.example.firsttry.entity.Student;
@@ -18,18 +19,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @ConditionalOnProperty(value = "test.mode", havingValue = "fouls")
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
     private final StudentMapper studentMapper;
-
-    public GroupServiceImpl(GroupRepository groupRepository, GroupMapper groupMapper, StudentMapper studentMapper) {
-        this.groupRepository = groupRepository;
-        this.groupMapper = groupMapper;
-        this.studentMapper = studentMapper;
-    }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)

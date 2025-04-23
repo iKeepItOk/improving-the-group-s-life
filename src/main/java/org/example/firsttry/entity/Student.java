@@ -23,7 +23,7 @@ public class Student {
     private String surname;
 
     @ManyToOne(cascade = {CascadeType.REFRESH,CascadeType.MERGE,
-            CascadeType.PERSIST,CascadeType.DETACH}, fetch = FetchType.LAZY)
+            CascadeType.PERSIST,CascadeType.DETACH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "university_groups_id")
     private UniversityGroup group;
 }

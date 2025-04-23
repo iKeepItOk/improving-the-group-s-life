@@ -1,5 +1,6 @@
 package org.example.firsttry.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.firsttry.DTO.AddStudentRequestDto;
 import org.example.firsttry.DTO.DeleteStudentRequestDto;
@@ -19,18 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @ConditionalOnProperty(value = "test.mode", havingValue = "fouls")
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
     private final GroupRepository groupRepository;
     private final StudentMapper studentMapper;
-
-    public StudentServiceImpl(StudentRepository studentRepository, GroupRepository groupRepository, StudentMapper studentMapper) {
-        this.studentRepository = studentRepository;
-        this.groupRepository = groupRepository;
-        this.studentMapper = studentMapper;
-    }
 
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED)
