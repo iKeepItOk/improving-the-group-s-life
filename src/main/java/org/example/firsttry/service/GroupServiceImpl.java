@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.firsttry.DTO.*;
 import org.example.firsttry.entity.Student;
 import org.example.firsttry.entity.UniversityGroup;
+import org.example.firsttry.error.Exception.GroupNameAlreadyExists;
 import org.example.firsttry.error.Exception.NotFoundGroupException;
 import org.example.firsttry.mapper.GroupMapper;
 import org.example.firsttry.mapper.StudentMapper;
 import org.example.firsttry.repository.GroupRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,16 +32,18 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public void addGroup(AddGroupRequestDto addGroupRequestDto) {
-        groupRepository.save(groupMapper.toEntity(addGroupRequestDto));
-        log.info("Group created with number: {}", addGroupRequestDto.getNumber());
+        try {
+            groupRepository.save(groupMapper.toEntity(addGroupRequestDto));
+            log.info("Group created with number: {}", addGroupRequestDto.getNumber());
+        } catch (DataIntegrityViolationException e) {
+            log.error("Group {} already exists", addGroupRequestDto.getNumber());
+            throw new GroupNameAlreadyExists(addGroupRequestDto.getNumber());
+        }
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public void deleteGroup(DeleteGroupRequestDto deleteGroupRequestDto) {
-        if (deleteGroupRequestDto.getNumber() == null) {
-            throw new NotFoundGroupException();
-        }
         groupRepository.deleteUniversityGroupByNumber(deleteGroupRequestDto.getNumber());
         log.info("Group deleted with number: {}", deleteGroupRequestDto.getNumber());
     }
@@ -49,7 +53,7 @@ public class GroupServiceImpl implements GroupService {
     public GetAllGroupResponseDto getAllGroups() {
         GetAllGroupResponseDto getAllGroup = new GetAllGroupResponseDto();
         List<UniversityGroup> groups = groupRepository.findAll();
-        log.info("Number of groups: {}", groups.size());
+        log.debug("Number of groups: {}", groups.size());
         getAllGroup.setGroups(groupMapper.toDtoList(groups));
         return getAllGroup;
     }
@@ -60,7 +64,8 @@ public class GroupServiceImpl implements GroupService {
         GetGroupResponseDto getGroup = new GetGroupResponseDto();
         UniversityGroup group = groupRepository.findUniversityGroupByNumber(number);
         if (group == null) {
-            throw new NotFoundGroupException();
+            log.error("Group {} not found", number);
+            throw new NotFoundGroupException(number);
         }
         List<Student> students = group.getStudents();
         log.info("Number of students: {}", students.size());
@@ -73,7 +78,8 @@ public class GroupServiceImpl implements GroupService {
     public void updateGroup(UpdateGroupRequestDto updateGroupRequestDto) {
         UniversityGroup group = groupRepository.findUniversityGroupByNumber(updateGroupRequestDto.getOldNumber());
         if (group == null) {
-            throw new NotFoundGroupException();
+            log.error("Group {} not found", updateGroupRequestDto.getOldNumber());
+            throw new NotFoundGroupException(updateGroupRequestDto.getOldNumber());
         }
         group.setNumber(updateGroupRequestDto.getNewNumber());
         groupRepository.save(group);

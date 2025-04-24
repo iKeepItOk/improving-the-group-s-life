@@ -2,12 +2,16 @@ package org.example.firsttry.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.firsttry.DTO.AddStudentRequestDto;
 import org.example.firsttry.DTO.DeleteStudentRequestDto;
+import org.example.firsttry.DTO.SuccessStudentResponseDto;
 import org.example.firsttry.DTO.UpdateStudentRequestDto;
 import org.example.firsttry.service.StudentService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,20 +24,23 @@ public class StudentController {
 
     @Operation(summary = "создать нового студента в группе")
     @PostMapping
-    public void addStudent(@RequestBody AddStudentRequestDto addStudentRequestDto) {
-        log.info("Start method add with group: {} surname {}", addStudentRequestDto.getNumberGroup(), addStudentRequestDto.getSurname());
+    public ResponseEntity<SuccessStudentResponseDto> addStudent(@RequestBody @Valid AddStudentRequestDto addStudentRequestDto) {
+        log.debug("Start method add with group: {} surname {}", addStudentRequestDto.getNumberGroup(), addStudentRequestDto.getSurname());
         studentService.addStudent(addStudentRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessStudentResponseDto(201,"Студент успено добавлен", addStudentRequestDto.getSurname()));
     }
     @Operation(summary = "Удалить студента из группы")
     @DeleteMapping
-    public void deleteStudent(@RequestBody DeleteStudentRequestDto deleteStudentRequestDto) {
-        log.info("Start method delete with group {} student {}", deleteStudentRequestDto.getNumberGroup(), deleteStudentRequestDto.getSurname());
+    public ResponseEntity<SuccessStudentResponseDto> deleteStudent(@RequestBody @Valid DeleteStudentRequestDto deleteStudentRequestDto) {
+        log.debug("Start method delete with group {} student {}", deleteStudentRequestDto.getNumberGroup(), deleteStudentRequestDto.getSurname());
         studentService.deleteStudent(deleteStudentRequestDto);
+        return ResponseEntity.ok(new SuccessStudentResponseDto(200,"Студент успешно удален", deleteStudentRequestDto.getSurname()));
     }
     @Operation(summary = "обновить данные студента")
     @PutMapping
-    public void updateStudent(@RequestBody UpdateStudentRequestDto updateStudentRequestDto) {
-        log.info("Start method update with group: {} surname {}", updateStudentRequestDto.getGroupNumber(), updateStudentRequestDto.getOldSurname());
+    public ResponseEntity<SuccessStudentResponseDto> updateStudent(@RequestBody @Valid UpdateStudentRequestDto updateStudentRequestDto) {
+        log.debug("Start method update with group: {} surname {}", updateStudentRequestDto.getGroupNumber(), updateStudentRequestDto.getOldSurname());
         studentService.updateStudent(updateStudentRequestDto);
+        return ResponseEntity.ok(new SuccessStudentResponseDto(200,"Студент успешно обнавлен", updateStudentRequestDto.getNewSurname()));
     }
 }

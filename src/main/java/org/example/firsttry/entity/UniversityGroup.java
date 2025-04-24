@@ -19,11 +19,11 @@ import java.util.List;
 @Table(name = "university_groups")
 public class UniversityGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private int id;
 
-    @Column(name = "group_number")
+    @Column(name = "group_number", unique = true, nullable = false)
     private String number;
 
     @OneToMany(mappedBy = "group", cascade = {CascadeType.REFRESH, CascadeType.MERGE,

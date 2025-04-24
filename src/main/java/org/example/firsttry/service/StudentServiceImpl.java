@@ -34,7 +34,8 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentMapper.toEntity(addStudentRequestDto);
         UniversityGroup group = groupRepository.findUniversityGroupByNumber(addStudentRequestDto.getNumberGroup());
         if (group == null) {
-            throw new NotFoundGroupException();
+            log.error("Group {} not found", addStudentRequestDto.getNumberGroup());
+            throw new NotFoundGroupException(addStudentRequestDto.getNumberGroup());
         }
         student.setGroup(group);
         group.addStudentToUniversityGroup(student);
@@ -48,11 +49,13 @@ public class StudentServiceImpl implements StudentService {
     public void deleteStudent(DeleteStudentRequestDto deleteStudentRequestDto) {
         UniversityGroup group = groupRepository.findUniversityGroupByNumber(deleteStudentRequestDto.getNumberGroup());
         if (group == null) {
-            throw new NotFoundGroupException();
+            log.error("Group {} not found", deleteStudentRequestDto.getNumberGroup());
+            throw new NotFoundGroupException(deleteStudentRequestDto.getNumberGroup());
         }
         Student student = studentRepository.findBySurname(deleteStudentRequestDto.getSurname());
         if (student == null) {
-            throw new NotFoundStudentException();
+            log.error("Student {} not found", deleteStudentRequestDto.getSurname());
+            throw new NotFoundStudentException(deleteStudentRequestDto.getSurname());
         }
         group.deleteStudentFromUniversityGroup(student);
         studentRepository.delete(student);
@@ -65,11 +68,13 @@ public class StudentServiceImpl implements StudentService {
     public void updateStudent(UpdateStudentRequestDto updateStudentRequestDto) {
         UniversityGroup group = groupRepository.findUniversityGroupByNumber(updateStudentRequestDto.getGroupNumber());
         if (group == null) {
-            throw new NotFoundGroupException();
+            log.error("Group {} not found", updateStudentRequestDto.getGroupNumber());
+            throw new NotFoundGroupException(updateStudentRequestDto.getGroupNumber());
         }
         Student student = studentRepository.findBySurname(updateStudentRequestDto.getOldSurname());
         if (student == null) {
-            throw new NotFoundStudentException();
+            log.error("Student {} not found", updateStudentRequestDto.getOldSurname());
+            throw new NotFoundStudentException(updateStudentRequestDto.getOldSurname());
         }
         group.deleteStudentFromUniversityGroup(student);
         student.setSurname(updateStudentRequestDto.getNewSurname());

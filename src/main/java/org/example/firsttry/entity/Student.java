@@ -15,11 +15,11 @@ import lombok.Setter;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private int id;
 
-    @Column(name = "surname")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
     @ManyToOne(cascade = {CascadeType.REFRESH,CascadeType.MERGE,
