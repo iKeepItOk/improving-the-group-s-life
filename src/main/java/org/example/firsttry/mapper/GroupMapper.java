@@ -15,7 +15,9 @@ public interface GroupMapper {
     UniversityGroup toEntity(AddGroupRequestDto addGroupRequestDto);
 
     @Mapping(target = "groupId", source = "id")
-    @Mapping(target = "quantity", expression = "java(universityGroup.getStudents().size())")
+    @Mapping(target = "quantity",
+            expression = "java(universityGroup.getStudents() != null" +
+                    " ? universityGroup.getStudents().size() : 0)")
     GetGroupFromAllResponseDto toDto(UniversityGroup universityGroup);
 
     List<GetGroupFromAllResponseDto> toDtoList(List<UniversityGroup> universityGroups);
