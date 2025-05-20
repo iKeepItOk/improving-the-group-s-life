@@ -1,11 +1,35 @@
 version: "3.8"
 services:
+  app:
+    build: .
+    image: firsttry-app:latest
+    container_name: firsttry-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prod}
+      DB_PASSWORD: ${DB_PASSWORD:-12345}
+      DB_USER: ${DB_USER:-postgres}
+      DB_NAME: ${DB_NAME:-FirstTry}
+    env_file:
+      - data.env
+    depends_on:
+      - db-students-api
+    restart: always
+
   db-students-api:
     image: postgres:17.5
     restart: always
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_USER: postgres
-      POSTGRES_DB: FirstTry
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-12345}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_DB:  ${DB_NAME:-FirstTry}
+    env_file:
+      - data.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
+    name: students_db_data
