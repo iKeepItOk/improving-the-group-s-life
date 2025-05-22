@@ -34,7 +34,7 @@ public class GroupServiceImpl implements GroupService {
     public void addGroup(AddGroupRequestDto addGroupRequestDto) {
         try {
             groupRepository.save(groupMapper.toEntity(addGroupRequestDto));
-            log.info("Group created with number: {}", addGroupRequestDto.getNumber());
+            log.debug("Group created with number: {}", addGroupRequestDto.getNumber());
         } catch (DataIntegrityViolationException e) {
             log.error("Group {} already exists", addGroupRequestDto.getNumber());
             throw new GroupNameAlreadyExists(addGroupRequestDto.getNumber());

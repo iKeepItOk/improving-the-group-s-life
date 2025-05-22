@@ -25,14 +25,14 @@ public class GroupController {
     public ResponseEntity<SuccessGroupResponseDto> addGroup(@RequestBody @Valid AddGroupRequestDto addGroupRequestDto) {
         log.debug("Start method add with number: {}", addGroupRequestDto.getNumber());
         groupService.addGroup(addGroupRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessGroupResponseDto(201,"Группа успешно добавлена",addGroupRequestDto.getNumber()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessGroupResponseDto(HttpStatus.CREATED.value(),"Группа успешно добавлена",addGroupRequestDto.getNumber()));
     }
     @Operation(summary = "Удалить группу")
     @DeleteMapping
     public ResponseEntity<SuccessGroupResponseDto> deleteGroup(@RequestBody @Valid DeleteGroupRequestDto deleteGroupRequestDto) {
         log.debug("Start method delete with number: {}", deleteGroupRequestDto.getNumber());
         groupService.deleteGroup(deleteGroupRequestDto);
-        return ResponseEntity.ok(new SuccessGroupResponseDto(200,"Группа успешно удалена",deleteGroupRequestDto.getNumber()));
+        return ResponseEntity.ok(new SuccessGroupResponseDto(HttpStatus.OK.value(), "Группа успешно удалена",deleteGroupRequestDto.getNumber()));
     }
     @Operation(summary = "Показать список всех групп с количеством студентов")
     @GetMapping(path = "/all")
@@ -51,7 +51,7 @@ public class GroupController {
     public ResponseEntity<SuccessGroupResponseDto> updateGroup(@RequestBody @Valid UpdateGroupRequestDto updateGroupRequestDto) {
         log.debug("Start method update group with number: {}", updateGroupRequestDto.getOldNumber());
         groupService.updateGroup(updateGroupRequestDto);
-        return ResponseEntity.ok(new SuccessGroupResponseDto(200,"Группа успешно обновлена",updateGroupRequestDto.getNewNumber()));
+        return ResponseEntity.ok(new SuccessGroupResponseDto(HttpStatus.OK.value(), "Группа успешно обновлена",updateGroupRequestDto.getNewNumber()));
     }
 
 }

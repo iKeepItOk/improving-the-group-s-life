@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class SuccessGroupResponseDto {
     @Schema(description = "статус выполненого дейсвтия", example = "201")
     private int status;
-    @Schema(description = "сообщение об выполненом действии", example = "группа успешно")
+    @Schema(description = "сообщение об выполненом действии", example = "группа успешно добавлена")
     private String message;
     @Schema(description = "Номер группы", example = "IT-404")
     private String groupNumber;
