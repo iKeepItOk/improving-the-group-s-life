@@ -1,10 +1,7 @@
 package org.example.firsttry.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.firsttry.DTO.AddGroupRequestDto;
-import org.example.firsttry.DTO.DeleteGroupRequestDto;
-import org.example.firsttry.DTO.GetAllGroupResponseDto;
-import org.example.firsttry.DTO.GetGroupFromAllResponseDto;
+import org.example.firsttry.DTO.*;
 import org.example.firsttry.service.GroupService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -78,6 +76,40 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$.groups[1].number").value("IT-505"))
                 .andExpect(jsonPath("$.groups[1].quantity").value(15));
         verify(groupService, times(1)).getAllGroups();
+    }
+    @Test
+    void getGroupTest() throws Exception {
+        String request = "IT-404";
+        GetGroupResponseDto response = new GetGroupResponseDto();
+        response.setStudents(List.of(
+                new GetStudentResponseDto(1,"Ivanov"),
+                new GetStudentResponseDto(2,"Petrov")
+        ));
+        when(groupService.getGroup(request)).thenReturn(response);
+        mockMvc.perform(get("/groups")
+                .param("number", request))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.students.length()").value(2))
+                .andExpect(jsonPath("$.students[0].id").value(1))
+                .andExpect(jsonPath("$.students[0].surname").value("Ivanov"))
+                .andExpect(jsonPath("$.students[1].id").value(2))
+                .andExpect(jsonPath("$.students[1].surname").value("Petrov"));
+        verify(groupService, times(1)).getGroup(request);
+
+
+    }
+    @Test
+    void updateGroupTest() throws Exception {
+        UpdateGroupRequestDto request = new UpdateGroupRequestDto("IT-404","IT-505");
+        mockMvc.perform(put("/groups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Группа успешно обновлена"))
+                .andExpect(jsonPath("$.groupNumber").value("IT-505"));
+        verify(groupService, times(1)).updateGroup(request);
+
     }
 
 }
