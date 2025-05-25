@@ -27,7 +27,7 @@ public class StudentController {
     public ResponseEntity<SuccessStudentResponseDto> addStudent(@RequestBody @Valid AddStudentRequestDto addStudentRequestDto) {
         log.debug("Start method add with group: {} surname {}", addStudentRequestDto.getNumberGroup(), addStudentRequestDto.getSurname());
         studentService.addStudent(addStudentRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessStudentResponseDto(201,"Студент успено добавлен", addStudentRequestDto.getSurname()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessStudentResponseDto(201,"Студент успешно добавлен", addStudentRequestDto.getSurname()));
     }
     @Operation(summary = "Удалить студента из группы")
     @DeleteMapping

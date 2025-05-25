@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "DTO для добавления студента в группу")
 public class AddStudentRequestDto {
-    @Schema(description = "номер группы", example = "IT-404")
+    @Schema(description = "фамилия студента", example = "Ivanov")
     @NotBlank(message = "Неккоректные данные в фамилии студента")
     private String surname;
 
